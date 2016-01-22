@@ -142,21 +142,19 @@ class ParametersFinder:
         """
         
         newIndividual = copy.deepcopy(baseIndividual)
-        numMutations = random.randint(0, maxMutations)
+        # As baseIndividuals are always included, there should be at
+        # least 1 mutation per individual.
+        numMutations = random.randint(1, maxMutations)
         
         for _ in xrange(numMutations):
             param = random.choice(newIndividual)
             
             if random.random() < param.mutationProb:
                 newValue = {
-                    #'int': param.value + random.randint(-param.maxChange,
-                    #        param.maxChange),
-                    'int': param.value + (random.choice((-1, 1)) * random.randint(-param.maxChange,
-                            param.maxChange)),
-                    #'float': param.value + random.uniform(-param.maxChange,
-                            #param.maxChange),
-                    'float': param.value + (random.choice((-1, 1)) * random.uniform(-param.maxChange,
-                            param.maxChange)),
+                    'int': param.value + (random.choice((-1, 1)) * 
+                        random.randint(1, param.maxChange)),
+                    'float': param.value + random.uniform(-param.maxChange,
+                            param.maxChange),
                     'bool': not param.value
                 }[param.dataType]
                 

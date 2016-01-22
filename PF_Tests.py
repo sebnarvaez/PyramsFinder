@@ -45,7 +45,7 @@ if __name__ == '__main__':
             maxIterations=-1,
             minScore=50,
             maxMutations=1,
-            #parallelization=True,
+            parallelization=True,
             verbosity=2
         )
 
