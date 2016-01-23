@@ -3,8 +3,8 @@
 #  PramsFinder.py
 #  Author: Larvasapiens <sebasnr95@gmail.com>
 #  Creation Date: 2016-01-16
-#  Last Modification: 2016-01-21
-#  Version: 1.1
+#  Last Modification: 2016-01-22
+#  Version: 1.2
 
 from __future__ import print_function
 from multiprocessing import Pool
@@ -13,6 +13,7 @@ import sys
 import random
 import copy
 import time
+import os
 
 # Functions defined at the module level because of conflicts with the
 # python's multiprocessing module.
@@ -102,6 +103,13 @@ class Parameter:
         self.maxVal = maxVal
         self.maxChange = maxChange
         self.mutationProb = mutationProb
+    
+    def __repr__(self):
+        
+        return "Parameter(name='{}', dataType={}, value={}, minVal={}, "\
+            "maxVal={}, maxChange={}, mutationProb={})".format(self.name,
+                self.dataType, self.value, self.minVal, self.maxVal,
+                self.maxChange, self.mutationProb)
 
 class ParametersFinder:
     """
@@ -199,7 +207,7 @@ class ParametersFinder:
     
     def findParams(self, populationSize, maxMutations=2, variety=2,
             maxIterations=200, maxTime=-1, minScore=-1, parallelization=False,
-            nCores=4, savingFrecuency=-1, verbosity=0):
+            nCores=4, savingFrequency=-1, verbosity=0):
         """
         The algorithm will iterate until maxIterations, maxTime or
         minScore is reached.
@@ -227,8 +235,7 @@ class ParametersFinder:
             On.
         @param savingFrequency=-1: How often (in generations) the best
             parameters found so far will be saved to a file. Files will
-            be saved on PyramsFinder/generation{i}.json -NOT YET
-            IMPLEMENTED-
+            be saved on {function's-name}_Optim/Iteration_{}.py
         @param verbosity=0: How much verbose about the procedure.
             0 doesn't print anything.
         
@@ -268,7 +275,7 @@ class ParametersFinder:
                             paramsList
                         )
                     )
-                    
+                
                 else:
                     scores = pool.map(
                         _applyParams, 
@@ -312,6 +319,27 @@ class ParametersFinder:
             
             iterationCount +=1
             elapsedMinutes = (time.time() - startTime) * (1.0 / 60.0)
+            
+            if (savingFrequency > 0) and (iterationCount % savingFrequency == 0):
+                
+                if self.isInstanceMethod:
+                    savingPath = self.evalFunc.im_func.func_name + '_Optim/'
+                else:
+                    savingPath = self.evalFunc.func_name + '_Optim/'
+                
+                if not os.path.exists(savingPath):
+                    os.mkdir(savingPath)
+                
+                fileName = savingPath + 'Iteration{}.py'.format(iterationCount)
+                
+                with open(fileName, 'wb') as savingFile:
+                    savingFile.write(
+                        'nonOptimParams = {}\n'.format(self.nonOptimParams)
+                    )
+                    savingFile.write(
+                        'bestFindings = {}'.format(bestFindings)
+                    )
+            
             bestScore = max(bestFindings[1])
             
             if ((maxIterations != -1) and (iterationCount >= maxIterations)) or\
@@ -334,6 +362,3 @@ class ParametersFinder:
         bestIndividual = bestFindings[0][bestScoreIdx]
         
         return self._getIndivParamsDict(bestIndividual, self.nonOptimParams)
-
-# Test the algorithm.
-

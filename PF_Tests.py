@@ -46,6 +46,7 @@ if __name__ == '__main__':
             minScore=50,
             maxMutations=1,
             parallelization=True,
+            savingFrequency=2,
             verbosity=2
         )
 
@@ -53,24 +54,24 @@ if __name__ == '__main__':
     print(bestParameters)
     
     
-    paramsFinder = ParametersFinder(
-        c.evalFuncParallel,
-        (
-            Parameter('maxTime', 'float', value=1, minVal=0, maxVal=5,
-                maxChange=1),
-            Parameter('score', 'int', minVal=0, maxVal=50, maxChange=5)
-        ),
-        isInstanceMethod=True
-    )
-    bestParameters = paramsFinder.findParams(
-            populationSize=5,
-            variety=2,
-            maxTime=-1,
-            maxIterations=10,
-            minScore=50,
-            parallelization=True,
-            nCores=2
-        )
+    #paramsFinder = ParametersFinder(
+        #c.evalFuncParallel,
+        #(
+            #Parameter('maxTime', 'float', value=1, minVal=0, maxVal=5,
+                #maxChange=1),
+            #Parameter('score', 'int', minVal=0, maxVal=50, maxChange=5)
+        #),
+        #isInstanceMethod=True
+    #)
+    #bestParameters = paramsFinder.findParams(
+            #populationSize=5,
+            #variety=2,
+            #maxTime=-1,
+            #maxIterations=10,
+            #minScore=50,
+            #parallelization=True,
+            #nCores=2
+        #)
 
-    print("BEST FOUND:")
-    print(bestParameters)
+    #print("BEST FOUND:")
+    #print(bestParameters)
