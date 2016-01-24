@@ -80,11 +80,14 @@ class Parameter:
         
         # Validations:
         if value is None:
-            value = {
-                'int': random.randint(minVal, maxVal),
-                'float': random.uniform(minVal, maxVal),
-                'bool': random.choice((True, False))
-            }[dataType]
+            if dataType == 'int':
+                value = random.randint(minVal, maxVal)
+                
+            elif dataType == 'float':
+                random.uniform(minVal, maxVal)
+                
+            elif dataType == 'bool':
+                random.choice((True, False))
         
         if maxVal <= minVal:
             raise ValueError("maxVal must be greater than minVal")
@@ -106,7 +109,7 @@ class Parameter:
     
     def __repr__(self):
         
-        return "Parameter(name='{}', dataType={}, value={}, minVal={}, "\
+        return "Parameter(name='{}', dataType='{}', value={}, minVal={}, "\
             "maxVal={}, maxChange={}, mutationProb={})".format(self.name,
                 self.dataType, self.value, self.minVal, self.maxVal,
                 self.maxChange, self.mutationProb)
@@ -158,13 +161,21 @@ class ParametersFinder:
             param = random.choice(newIndividual)
             
             if random.random() < param.mutationProb:
-                newValue = {
-                    'int': param.value + (random.choice((-1, 1)) * 
-                        random.randint(1, param.maxChange)),
-                    'float': param.value + random.uniform(-param.maxChange,
-                            param.maxChange),
-                    'bool': not param.value
-                }[param.dataType]
+            
+                if verbosity > 2:
+                    print("--- New Individual ---")
+                    print("Choosen for mutation: {}".format(param.name))
+                
+                if param.dataType == 'int':
+                    newValue = param.value + (random.choice((-1, 1)) * 
+                        random.randint(1, param.maxChange))
+                        
+                elif param.dataType == 'float':
+                    newValue = param.value + random.uniform(-param.maxChange,
+                        param.maxChange)
+                        
+                elif param.dataType == 'bool':
+                    newValue = not param.value
                 
                 if param.dataType in Parameter.VALID_CONT_DATATYPES:
                     
@@ -173,6 +184,9 @@ class ParametersFinder:
                         
                     elif newValue < param.minVal:
                         newValue = param.minVal
+                
+                if verbosity > 2:
+                    print("Before: {}, After: {}".format(param.value, newValue))
                 
                 param.value = newValue
         
@@ -263,7 +277,6 @@ class ParametersFinder:
                 ]
                 
                 #print(self.population)
-                
                 if self.isInstanceMethod:
                     instance = self.evalFunc.im_self
                     methodName = self.evalFunc.im_func.func_name
@@ -295,7 +308,8 @@ class ParametersFinder:
                     )
                     scores.append(_applyParams((self.evalFunc, indivParams)))
             
-            print(scores)
+            if verbosity > 1:
+                print("Scores obtained: {}".format(scores))
             
             for scoreIdx, score in enumerate(scores):
                 
@@ -312,7 +326,11 @@ class ParametersFinder:
                 
                     for idx, storedScore in enumerate(bestFindings[1]):
                     
-                        if score > storedScore:
+                        if (score > storedScore) or\
+                                (
+                                    (score == storedScore) and \
+                                    (random.choice(True, False))
+                                ):
                             bestFindings[0][idx] = self.population[scoreIdx]
                             bestFindings[1][idx] = score
                             break
