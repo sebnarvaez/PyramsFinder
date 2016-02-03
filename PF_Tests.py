@@ -38,14 +38,18 @@ if __name__ == '__main__':
         (Parameter('b', 'int', value=50, minVal=0, maxVal=50, maxChange=5),),
         nonOptimParams={'a' : 70}
     )
+    
     bestParameters = paramsFinder.findParams(
             populationSize=5,
-            variety=2,
-            maxTime=-1,
-            maxIterations=-1,
-            minScore=50,
             maxMutations=1,
-            parallelization=True,
+            variety=2,
+            elitism=1,
+            selectionTechnique='RouletteWheel',
+            randomizeFirstGen=True,
+            maxIterations=-1,
+            maxTime=-1,
+            minScore=50,
+            nParallelEvals=1,
             savingFrequency=2,
             verbosity=2
         )
@@ -54,24 +58,29 @@ if __name__ == '__main__':
     print(bestParameters)
     
     
-    #paramsFinder = ParametersFinder(
-        #c.evalFuncParallel,
-        #(
-            #Parameter('maxTime', 'float', value=1, minVal=0, maxVal=5,
-                #maxChange=1),
-            #Parameter('score', 'int', minVal=0, maxVal=50, maxChange=5)
-        #),
-        #isInstanceMethod=True
-    #)
-    #bestParameters = paramsFinder.findParams(
-            #populationSize=5,
-            #variety=2,
-            #maxTime=-1,
-            #maxIterations=10,
-            #minScore=50,
-            #parallelization=True,
-            #nCores=2
-        #)
+    paramsFinder = ParametersFinder(
+        c.evalFuncParallel,
+        (
+            Parameter('maxTime', 'float', value=1, minVal=0, maxVal=5,
+                maxChange=1),
+            Parameter('score', 'int', minVal=0, maxVal=50, maxChange=5)
+        ),
+        isInstanceMethod=True
+    )
+    bestParameters = paramsFinder.findParams(
+            populationSize=5,
+            maxMutations=2,
+            variety=2,
+            elitism=1,
+            selectionTechnique='RouletteWheel',
+            randomizeFirstGen=True,
+            maxIterations=10,
+            maxTime=-1,
+            minScore=50,
+            nParallelEvals=2,
+            savingFrequency=1,
+            verbosity=2
+        )
 
-    #print("BEST FOUND:")
-    #print(bestParameters)
+    print("BEST FOUND:")
+    print(bestParameters)
